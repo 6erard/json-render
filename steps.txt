@@ -1,0 +1,87 @@
+✅ Step-by-Step (Windows)
+🛠️ Prerequisites
+
+    Make sure you have Node.js installed
+    👉 Download from https://nodejs.org
+
+To verify, open Command Prompt and type:
+
+node -v
+npm -v
+
+📁 Step 1: Create a project folder
+
+mkdir graph-generator
+cd graph-generator
+
+📦 Step 2: Initialize Node.js project
+
+npm init -y
+
+📦 Step 3: Install @aduh95/viz.js and fs (built-in, so no need to install separately)
+
+npm install @aduh95/viz.js
+
+✍️ Step 4: Create json-to-graph-svg.js
+
+Use Notepad or your favorite editor to create the file.
+
+const fs = require('fs');
+const { renderString } = require('@aduh95/viz.js');
+
+// Sample graph data
+const graphJson = {
+  nodes: ["A", "B", "C", "D"],
+  edges: [
+    { from: "A", to: "B" },
+    { from: "A", to: "C" },
+    { from: "B", to: "D" },
+    { from: "C", to: "D" }
+  ]
+};
+
+// Convert to DOT format
+function jsonToDot(json) {
+  let dot = 'digraph G {\n';
+  for (const node of json.nodes) {
+    dot += `  "${node}";\n`;
+  }
+  for (const edge of json.edges) {
+    dot += `  "${edge.from}" -> "${edge.to}";\n`;
+  }
+  dot += '}';
+  return dot;
+}
+
+// Generate SVG and save to file
+async function generateSvg(dotString, outputFile) {
+  try {
+    const svg = await renderString(dotString);
+    fs.writeFileSync(outputFile, svg, 'utf-8');
+    console.log(`✅ Graph saved as SVG: ${outputFile}`);
+
+    // Optional: open SVG in default browser
+    require('child_process').exec(`start ${outputFile}`);
+  } catch (err) {
+    console.error('Error generating SVG:', err);
+  }
+}
+
+// Run
+const dot = jsonToDot(graphJson);
+generateSvg(dot, 'graph-output.svg');
+
+▶️ Step 5: Run the script
+
+In the same folder, run:
+
+node json-to-graph-svg.js
+
+You should see:
+
+✅ Graph saved as SVG: graph-output.svg
+
+And the SVG will open in your default browser.
+🖼️ Output
+
+You’ll now have a file named graph-output.svg in the folder — a visual graph rendered from the JSON input.
