@@ -1,0 +1,86 @@
+
+✅ Run the JSON-to-Graph (SVG) Code WITHOUT npm install
+
+We'll do this by manually downloading the Viz.js library and using it as a local file.
+🔧 Step-by-Step Setup (No NPM)
+📁 1. Create Your Project Folder
+
+mkdir graph-generator
+cd graph-generator
+
+📥 2. Download Viz.js Files (Manually)
+Go to the following link:
+
+👉 https://cdn.jsdelivr.net/npm/@aduh95/viz.js@2.1.2/
+
+    This is the version of the Viz.js library hosted on jsDelivr CDN.
+
+Download these 2 files and place them in your graph-generator folder:
+
+    viz.js
+    Download viz.js
+
+    full.render.js (the Graphviz WebAssembly engine)
+    Download full.render.js
+
+📄 3. Create Your Script: json-to-graph-svg.js
+
+Save this in the same folder as the downloaded files:
+
+const fs = require('fs');
+const { Module, renderString } = require('./viz.js');
+
+// Graph data
+const graphJson = {
+  nodes: ["A", "B", "C", "D"],
+  edges: [
+    { from: "A", to: "B" },
+    { from: "A", to: "C" },
+    { from: "B", to: "D" },
+    { from: "C", to: "D" }
+  ]
+};
+
+// Convert to DOT
+function jsonToDot(json) {
+  let dot = 'digraph G {\n';
+  for (const node of json.nodes) {
+    dot += `  "${node}";\n`;
+  }
+  for (const edge of json.edges) {
+    dot += `  "${edge.from}" -> "${edge.to}";\n`;
+  }
+  dot += '}';
+  return dot;
+}
+
+// Generate SVG and save
+async function generateSvg(dotString, outputFile) {
+  try {
+    const svg = await renderString(dotString, { engine: "dot" });
+    fs.writeFileSync(outputFile, svg, 'utf-8');
+    console.log(`✅ Graph saved as SVG: ${outputFile}`);
+    require('child_process').exec(`start ${outputFile}`); // Open in browser
+  } catch (err) {
+    console.error('Error:', err);
+  }
+}
+
+// Run it
+const dot = jsonToDot(graphJson);
+generateSvg(dot, 'graph-output.svg');
+
+▶️ 4. Run the Script
+
+In the Command Prompt:
+
+node json-to-graph-svg.js
+
+✅ You should see the message and the SVG open in your default browser!
+📁 Final Folder Structure
+
+graph-generator/
+├── viz.js
+├── full.render.js
+├── json-to-graph-svg.js
+
